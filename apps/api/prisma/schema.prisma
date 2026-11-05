@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Device {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  apiKeyHash String   @unique
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  sensors Sensor[]
+}
+
+model Sensor {
+  id        String   @id @default(cuid())
+  deviceId  String
+  name      String
+  unit      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  device   Device          @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  readings SensorReading[]
+
+  @@unique([deviceId, name])
+  @@index([deviceId])
+}
+
+model SensorReading {
+  id         String   @id @default(cuid())
+  sensorId   String
+  externalId String?  @unique
+  value      Float
+  recordedAt DateTime @db.Timestamptz(3)
+  receivedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Restrict)
+
+  @@index([sensorId, recordedAt])
+  @@index([recordedAt])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
