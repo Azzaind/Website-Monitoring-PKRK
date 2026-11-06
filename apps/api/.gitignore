@@ -36,3 +36,12 @@ skills-lock.json
 test-*.xlsx
 test-*.csv
 test-websocket.html
+# Local-only database maintenance and simulated tests
+src/clean-dummy-sensors.ts
+src/get-device-id.ts
+src/check-sensors.ts
+src/test-sensor.ts
+src/test-gps.ts
+src/test-geofence.ts
+src/test-geofence-config.ts
+src/test-websocket.ts

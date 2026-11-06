@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Device" ADD COLUMN     "geofenceRadius" DOUBLE PRECISION DEFAULT 100,
+ADD COLUMN     "latitude" DOUBLE PRECISION,
+ADD COLUMN     "longitude" DOUBLE PRECISION;

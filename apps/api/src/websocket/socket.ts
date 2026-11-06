@@ -29,6 +29,18 @@ export function initializeWebSocket(server: Server) {
   console.log("WebSocket server initialized!");
 }
 
+function broadcast(message: object) {
+  if (!wss) return;
+
+  const payload = JSON.stringify(message);
+
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(payload);
+    }
+  });
+}
+
 export function broadcastReading(data: {
   deviceId: string;
   sensorName: string;
@@ -36,16 +48,23 @@ export function broadcastReading(data: {
   unit: string;
   recordedAt: string;
 }) {
-  if (!wss) return;
-
-  const message = JSON.stringify({
+  broadcast({
     type: "NEW_READING",
     data,
   });
+}
 
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
+export function broadcastLocation(data: {
+  deviceId: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number | null;
+  recordedAt: string;
+  geofenceStatus?: string;
+  distanceFromInstallation?: number | null;
+}) {
+  broadcast({
+    type: "NEW_LOCATION",
+    data,
   });
 }

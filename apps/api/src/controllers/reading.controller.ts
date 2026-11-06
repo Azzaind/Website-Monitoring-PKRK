@@ -1,4 +1,3 @@
-
 import { Request, Response } from "express";
 import { prisma } from "../config/database";
 import { broadcastReading } from "../websocket/socket";
@@ -37,6 +36,9 @@ export async function receiveReadings(req: Request, res: Response) {
     // 3. Validasi setiap pembacaan
     for (const reading of readings) {
       if (
+        !reading ||
+        typeof reading !== "object" ||
+        Array.isArray(reading) ||
         typeof reading.sensorName !== "string" ||
         reading.sensorName.trim().length === 0 ||
         reading.sensorName.length > 100 ||
