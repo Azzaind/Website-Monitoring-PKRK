@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -9,6 +8,9 @@ import historyRoutes from "./routes/history.routes";
 import exportRoutes from "./routes/export.routes";
 import { initializeWebSocket } from "./websocket/socket";
 import authRoutes from "./routes/auth.routes";
+import locationRoutes from "./routes/location.routes";
+import locationReadRoutes from "./routes/location-read.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 
 const app = express();
 
@@ -23,6 +25,9 @@ app.use("/api/sensors", sensorRoutes);
 app.use("/api/readings", readingRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/export", exportRoutes);
+app.use("/api/locations", locationRoutes);
+app.use("/api/locations", locationReadRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {

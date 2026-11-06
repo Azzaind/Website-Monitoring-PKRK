@@ -8,13 +8,17 @@ datasource db {
 }
 
 model Device {
-  id         String   @id @default(cuid())
-  name       String   @unique
-  apiKeyHash String   @unique
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
+  id             String   @id @default(cuid())
+  name           String   @unique
+  apiKeyHash     String   @unique
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  latitude       Float?
+  longitude      Float?
+  geofenceRadius Float?   @default(100)
 
-  sensors Sensor[]
+  sensors   Sensor[]
+  locations DeviceLocation[]
 }
 
 model Sensor {
@@ -43,6 +47,22 @@ model SensorReading {
   sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Restrict)
 
   @@index([sensorId, recordedAt])
+  @@index([recordedAt])
+}
+
+model DeviceLocation {
+  id             String   @id @default(cuid())
+  deviceId       String
+  externalId     String?  @unique
+  latitude       Float
+  longitude      Float
+  accuracyMeters Float?
+  recordedAt     DateTime @db.Timestamptz(3)
+  receivedAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+
+  @@index([deviceId, recordedAt])
   @@index([recordedAt])
 }
 
