@@ -1,0 +1,124 @@
+/* Scroll halus dan jarak aman dari top bar */
+html{scroll-behavior:smooth}
+#overview,#sensors,#chart,#map,#unduh,.content-section{scroll-margin-top:88px}
+
+/* Muncul saat di-scroll */
+.reveal{
+  opacity:0;
+  transform:translateY(26px);
+  transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);
+  transition-delay:var(--d,0ms);
+}
+.reveal.in{opacity:1;transform:none}
+.kpi-grid>.reveal>*{height:100%}
+
+/* Kurva easing */
+:root{
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-in:cubic-bezier(.5,0,.75,0);
+  --ease-in-out:cubic-bezier(.65,0,.35,1);
+}
+
+/* Tombol: ease out saat disorot dan kembali, ease in saat ditekan.
+   Diawali "html" agar mengalahkan transition: all dari globals.css */
+html :is(button,.btn,[role="button"],.nav-item,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn,.logout-btn){
+  transition:
+    transform .3s var(--ease-out),
+    background-color .3s var(--ease-in-out),
+    color .3s var(--ease-in-out),
+    border-color .3s var(--ease-in-out),
+    box-shadow .3s var(--ease-out);
+}
+html :is(.btn,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn):not(:disabled):hover{
+  transform:translateY(-2px);
+}
+html :is(button,.btn,[role="button"],.nav-item,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn):not(:disabled):active{
+  transform:scale(.94);
+  transition-duration:.1s;
+  transition-timing-function:var(--ease-in);
+}
+
+/* Pop saat diklik (kelas ditambahkan lewat useButtonFx) */
+.fx-pop.fx-pop{animation:fxPop .5s cubic-bezier(.22,1,.36,1)}
+@keyframes fxPop{
+  0%{transform:scale(1)}
+  30%{transform:scale(.9)}
+  65%{transform:scale(1.07)}
+  100%{transform:scale(1)}
+}
+
+/* Pop saat tombol berubah menjadi aktif atau status berubah */
+button.active,a.active,.species-btn.active,
+[aria-pressed="true"],[aria-selected="true"],[aria-current="page"],[aria-current="true"],
+.status-pill.on,.status-pill.off{
+  animation:fxChange .5s cubic-bezier(.22,1,.36,1);
+}
+@keyframes fxChange{
+  0%{transform:scale(.88);filter:brightness(1.5)}
+  60%{transform:scale(1.07)}
+  100%{transform:scale(1);filter:none}
+}
+
+/* Jika sistem meminta gerakan dikurangi: hanya memudar halus, tanpa bergeser */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{transform:none;transition:opacity .5s ease;transition-delay:var(--d,0ms)}
+}
+
+/* Tombol di top bar, kartu, grafik, peta, dan panel tetap beranimasi walau sistem
+   meminta gerakan dikurangi (!important perlu untuk mengalahkan aturan di globals.css).
+   Hapus blok ini jika ingin sepenuhnya mengikuti pengaturan sistem. */
+@media(prefers-reduced-motion:reduce){
+  html :is(button,.btn,[role="button"],.nav-item,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn,.logout-btn){
+    transition:
+      transform .3s var(--ease-out),
+      background-color .3s var(--ease-in-out),
+      color .3s var(--ease-in-out),
+      border-color .3s var(--ease-in-out),
+      box-shadow .3s var(--ease-out) !important;
+  }
+  html :is(button,.btn,[role="button"],.nav-item,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn):not(:disabled):active{
+    transition-duration:.1s !important;
+    transition-timing-function:var(--ease-in) !important;
+  }
+  .fx-pop.fx-pop{animation:fxPop .5s var(--ease-out) !important}
+  html :is(button.active,a.active,.species-btn.active,.sensor-tab.active,[aria-pressed="true"],[aria-selected="true"]){
+    animation:fxChange .5s var(--ease-out) !important;
+  }
+}
+
+/* Efek lebih terlihat: cahaya kuning saat disorot dan riak gelombang saat diklik */
+html :is(.btn,.species-btn,.sensor-tab,.seg button,.theme-toggle-btn):not(:disabled):hover{
+  box-shadow:0 8px 20px rgba(255,196,0,.3);
+}
+.fx-ripple{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  background:currentColor;
+  opacity:.35;
+  transform:scale(0);
+  animation:fxRipple .65s var(--ease-out) forwards;
+}
+@keyframes fxRipple{
+  to{transform:scale(1);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .fx-ripple{animation:fxRipple .65s var(--ease-out) forwards !important}
+}
+
+/* Top bar tetap menempel di atas saat halaman digulir.
+   overflow-x: hidden pada elemen induk membuat position: sticky tidak berfungsi,
+   jadi diganti clip yang tetap mencegah scroll horizontal tanpa membuat wadah scroll. */
+html:root,
+html body,
+html body .dashboard-layout-root,
+html body .dashboard-main-area,
+html body .dashboard-content{
+  overflow-x:clip;
+}
+html body .dashboard-topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+}

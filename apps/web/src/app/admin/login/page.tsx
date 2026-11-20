@@ -35,18 +35,45 @@ export default function LoginPage() {
       <Header />
       <main className="wrap login">
         <form onSubmit={submit}>
-          <h1 className="ptitle">Masuk admin</h1>
+          <h1 className="ptitle">Masuk Admin</h1>
+          <p className="meta" style={{ marginTop: -8 }}>
+            Gunakan akun admin yang terdaftar pada Backend PKRKABMAS.
+          </p>
           <label>
-            Email
-            <input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            Email Admin
+            <input
+              type="email"
+              autoComplete="username"
+              required
+              placeholder="admin@pkrkabmas.local"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </label>
           <label>
-            Kata sandi
-            <input type="password" autoComplete="current-password" required value={pw} onChange={(e) => setPw(e.target.value)} />
+            Kata Sandi
+            <input
+              type="password"
+              autoComplete="current-password"
+              required
+              placeholder="••••••••"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+            />
           </label>
-          {err && <p className="msg err" role="alert">{err}</p>}
-          <button className="btn" disabled={busy}>{busy ? "Memeriksa…" : "Masuk"}</button>
-          {MOCK && <p className="meta">{DEMO.email} dengan kata sandi {DEMO.password}</p>}
+          {err && (
+            <p className="msg err" role="alert">
+              {err}
+            </p>
+          )}
+          <button className="btn" disabled={busy}>
+            {busy ? "Memverifikasi ke Backend…" : "Masuk"}
+          </button>
+          {MOCK && (
+            <p className="meta" style={{ marginTop: 8 }}>
+              Mode simulasi aktif: {DEMO.email} dengan kata sandi {DEMO.password}
+            </p>
+          )}
         </form>
       </main>
     </>
