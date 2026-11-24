@@ -129,6 +129,7 @@ export async function receiveReadings(req: Request, res: Response) {
         value: reading.value,
         unit: sensor.unit,
         recordedAt: reading.recordedAt.toISOString(),
+        accessLevel: sensor.accessLevel,
       });
     }
 

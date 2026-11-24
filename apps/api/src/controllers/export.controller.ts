@@ -95,8 +95,22 @@ async function getExportData(
   return { readings };
 }
 
-function escapeCSV(value: string | number | null | undefined): string {
+function sanitizeSpreadsheetText(value: string | null | undefined): string {
   const text = String(value ?? "");
+
+  if (/^[\p{White_Space}\u0000-\u001F]*[=+\-@]/u.test(text)) {
+    return `'${text}`;
+  }
+
+  return text;
+}
+
+function escapeCSV(value: string | number | null | undefined): string {
+  const text =
+    typeof value === "string"
+      ? sanitizeSpreadsheetText(value)
+      : String(value ?? "");
+
   return `"${text.replace(/"/g, '""')}"`;
 }
 
@@ -140,16 +154,16 @@ export async function exportReadingsExcel(req: Request, res: Response) {
     result.readings.forEach((reading, index) => {
       worksheet.addRow({
         no: index + 1,
-        sensor: reading.sensor.name,
+        sensor: sanitizeSpreadsheetText(reading.sensor.name),
         value: reading.value ?? "",
-        unit: reading.sensor.unit,
+        unit: sanitizeSpreadsheetText(reading.sensor.unit),
         recordedAt: reading.recordedAt.toLocaleString("id-ID", {
           timeZone: "Asia/Jakarta",
         }),
         receivedAt: reading.receivedAt.toLocaleString("id-ID", {
           timeZone: "Asia/Jakarta",
         }),
-        externalId: reading.externalId ?? "",
+        externalId: sanitizeSpreadsheetText(reading.externalId),
       });
     });
 

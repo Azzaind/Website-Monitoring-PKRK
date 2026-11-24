@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { getReadingHistory } from "../controllers/history.controller";
-import { authenticateAdmin } from "../middleware/auth-admin.middleware";
+import { optionalAdmin } from "../middleware/optional-admin.middleware";
 
 const router = Router();
-
-router.get("/", authenticateAdmin, getReadingHistory);
-
+router.get("/", optionalAdmin, getReadingHistory);
 export default router;

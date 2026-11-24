@@ -1,61 +1,46 @@
-
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import bcrypt from "bcrypt";
-import { randomBytes } from "node:crypto";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL belum ditemukan di .env");
+if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL belum ditemukan di .env");
+if (!process.env.SEED_DEVICE_ID) {
+  throw new Error("Isi SEED_DEVICE_ID dengan ID perangkat yang sudah ada. Seed ini tidak membuat perangkat baru atau mengganti API key.");
 }
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
-
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-async function main() {
-  // Membuat perangkat atau mengambil perangkat yang sudah ada
-  const apiKey = randomBytes(32).toString("hex");
-  const apiKeyHash = await bcrypt.hash(apiKey, 12);
-  const device = await prisma.device.upsert({
-    where: { name: "device_001" },
-    update: {
-      apiKeyHash: apiKeyHash,
-    },
-    create: {
-      name: "device_001",
-      apiKeyHash: apiKeyHash,
-    },
-  });
+const sensors = [
+  // Unit sensor existing tidak ditimpa ketika seed dijalankan.
+  { name: "ec", unit: "UNCONFIGURED", accessLevel: "PUBLIC" },
+  { name: "ph", unit: "UNCONFIGURED", accessLevel: "PUBLIC" },
+  { name: "temperature", unit: "UNCONFIGURED", accessLevel: "PUBLIC" },
+  { name: "turbidity", unit: "UNCONFIGURED", accessLevel: "PUBLIC" },
+  { name: "do", unit: "UNCONFIGURED", accessLevel: "PUBLIC" },
+  { name: "water_level", unit: "cm", accessLevel: "PUBLIC" },
+  { name: "solar_power", unit: "W", accessLevel: "PUBLIC" },
+  { name: "solar_voltage", unit: "V", accessLevel: "ADMIN" },
+  { name: "solar_current", unit: "A", accessLevel: "ADMIN" },
+] as const;
 
-  // Mendaftarkan tiga sensor sementara
-  const sensors = [
-    { name: "sensor_1", unit: "unit_1" },
-    { name: "sensor_2", unit: "unit_2" },
-    { name: "sensor_3", unit: "unit_3" },
-  ];
+async function main() {
+  const device = await prisma.device.findUnique({ where: { id: process.env.SEED_DEVICE_ID } });
+  if (!device || !device.isActive) throw new Error("Device ID tidak ditemukan atau perangkat tidak aktif.");
 
   for (const sensor of sensors) {
     await prisma.sensor.upsert({
-      where: {
-        deviceId_name: {
-          deviceId: device.id,
-          name: sensor.name,
-        },
-      },
-      update: { unit: sensor.unit },
+      where: { deviceId_name: { deviceId: device.id, name: sensor.name } },
+      update: { accessLevel: sensor.accessLevel },
       create: {
         deviceId: device.id,
         name: sensor.name,
         unit: sensor.unit,
+        accessLevel: sensor.accessLevel,
       },
     });
   }
-  console.log("API Key:", apiKey);
-  console.log("Device and sensors successfully registered!");
-  console.log("Device ID:", device.id);
+
+  console.log(`Berhasil memperbarui hak akses 9 sensor untuk device ${device.id}. API key tidak diubah.`);
 }
 
 main()

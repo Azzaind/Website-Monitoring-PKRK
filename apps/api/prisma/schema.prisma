@@ -25,15 +25,17 @@ model Sensor {
   id        String   @id @default(cuid())
   deviceId  String
   name      String
-  unit      String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  unit        String
+  accessLevel String   @default("PUBLIC")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
   device   Device          @relation(fields: [deviceId], references: [id], onDelete: Restrict)
   readings SensorReading[]
 
   @@unique([deviceId, name])
   @@index([deviceId])
+  @@index([accessLevel])
 }
 
 model SensorReading {

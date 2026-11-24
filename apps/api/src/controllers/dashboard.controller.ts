@@ -36,7 +36,7 @@ export async function getDashboardOverview(
         id: true,
         name: true,
         sensors: {
-          where: { isActive: true },
+          where: { isActive: true, ...(res.locals.isAdmin ? {} : { accessLevel: "PUBLIC" }) },
           select: {
             id: true,
             name: true,
