@@ -1,4 +1,4 @@
-
+export {};
 const BASE_URL = "http://localhost:3000/api";
 const DEVICE_ID = "cmw0s8l580000mcivkdi0hq13";
 

@@ -6,7 +6,10 @@
     "dev": "tsx watch src/app.ts",
     "start": "tsx src/app.ts",
     "test:db": "tsx src/test-db.ts",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "test:sensor-access": "tsx src/test-sensor-access.ts",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate"
   },
   "keywords": [],
   "author": "",
